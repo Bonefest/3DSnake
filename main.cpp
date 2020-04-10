@@ -3,13 +3,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "program.h"
+#include "renderer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1080
+#define HEIGHT 720
 
 using namespace std;
 
@@ -25,7 +26,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(1080, 720, "Snake3D", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Snake3D", NULL, NULL);
     if(window == NULL) {
         std::cout << "Unable to create window!\n";
         glfwTerminate();
@@ -38,35 +39,15 @@ int main() {
         return -1;
     }
 
-    //glViewport(0, 0, 640, 480); will be called as well for the first loading
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // SHADER PREPARING ------------------------------------------------------
-    Program program("shaders/vertex.glsl", "shaders/fragment.glsl");
-    if(program.hasError()) {
-        std::cout << program.getErrorMessage() << std::endl;
-        return -1;
-    }
-
-
-    // DATA PREPARING  -------------------------------------------------------
-
-
-
-
-    // MISC ------------------------------------------------------------------
-
-    glm::mat4 model, view;
-
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), float(WIDTH) / float(HEIGHT), 0.1f, 100.0f);
-
-    GLint modelULoc = glGetUniformLocation(program.getProgramID(), "model");
-    GLint viewULoc = glGetUniformLocation(program.getProgramID(), "view");
-    GLint projULoc = glGetUniformLocation(program.getProgramID(), "proj");
-
-    // RENDER LOOP -----------------------------------------------------------
-
     glEnable(GL_DEPTH_TEST);
+
+
+    Renderer renderer;
+    glm::mat4 view, proj;
+
+    view = glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    proj = glm::perspective(45.0f, float(WIDTH)/float(HEIGHT), 0.1f, 100.0f);
 
     while(!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -74,14 +55,8 @@ int main() {
         glClearColor(0.73f, 0.88f, 0.98f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(program.getProgramID());
-
-
-        //BINDING TRANSFORMATIONS
-
-        glUniformMatrix4fv(viewULoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projULoc, 1, GL_FALSE, glm::value_ptr(proj));
-
+        renderer.renderCube(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        renderer.present(view, proj);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

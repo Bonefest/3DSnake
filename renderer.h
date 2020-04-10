@@ -2,17 +2,22 @@
 #define RENDERER_H_INCLUDED
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <deque>
 
 #include "program.h"
 #include "cube.h"
 
+using std::make_pair;
 using std::deque;
+using std::pair;
 
 class Renderer {
 public:
     Renderer() {
         program = new Program("shaders/vertex.glsl", "shaders/fragment.glsl");
+        uniformMVP = glGetUniformLocation(program->getProgramID(), "mvp");
 
         initBuffers();
     }
@@ -28,10 +33,23 @@ public:
         m_cubesQueue.push_back(make_pair(position, color));
     }
 
-    void present() {
-        for(auto cubeData : m_cubesQueue) {
+    void present(glm::mat4 viewMatrix, glm::mat4 projMatrix) {
+        glUseProgram(program->getProgramID());
 
+        glm::mat4 vp = projMatrix * viewMatrix;
+
+        for(auto cubeData : m_cubesQueue) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubeData.first);
+
+            glm::mat4 mvp = vp * model;
+            glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(mvp));
+
+            glBindVertexArray(VAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        m_cubesQueue.clear();
     }
 
 private:
@@ -56,6 +74,7 @@ private:
     deque<pair<glm::vec3, glm::vec3>> m_cubesQueue;
 
     unsigned int VAO, VBO;
+    GLint uniformMVP;
 };
 
 
