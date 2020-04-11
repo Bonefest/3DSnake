@@ -33,10 +33,10 @@ public:
         m_cubesQueue.push_back(make_pair(position, color));
     }
 
-    void present(glm::mat4 viewMatrix, glm::mat4 projMatrix) {
+    void present() {
         glUseProgram(program->getProgramID());
 
-        glm::mat4 vp = projMatrix * viewMatrix;
+        glm::mat4 vp = m_projection * m_view;
 
         for(auto cubeData : m_cubesQueue) {
             glm::mat4 model = glm::mat4(1.0f);
@@ -50,6 +50,14 @@ public:
         }
 
         m_cubesQueue.clear();
+    }
+
+    void setProjectionMatrix(glm::mat4 projection) {
+        m_projection = projection;
+    }
+
+    void setViewMatrix(glm::mat4 view) {
+        m_view = view;
     }
 
 private:
@@ -75,6 +83,8 @@ private:
 
     unsigned int VAO, VBO;
     GLint uniformMVP;
+
+    glm::mat4 m_projection, m_view;
 };
 
 
