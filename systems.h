@@ -43,34 +43,46 @@ private:
 
 class MovingSystem: public ISystem {
 public:
+    MovingSystem(): m_previousDirection(0.0f, 0.0f, 0.0f) { }
     void update(entt::registry& registry, entt::dispatcher& dispatcher, double delta) {
         m_elapsedTime += delta;
         auto snakeView = registry.view<Snake>();
         snakeView.each([&](entt::entity snake, Snake& snakeComponent) {
+            auto& parts = snakeComponent.parts;
             if(m_elapsedTime > LAG_TIME) {
-                for(std::size_t i = snakeComponent.parts.size() - 1; i > 0; i--) {
-                    snakeComponent.parts[i] = snakeComponent.parts[i - 1];
+                for(std::size_t i = parts.size() - 1; i > 0; i--) {
+                    parts[i] = parts[i - 1];
                 }
 
                 m_elapsedTime = 0.0f;
             }
 
-            snakeComponent.parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (0.95f / LAG_TIME);
-            snakeComponent.parts[0] = wrapPosition(snakeComponent.parts[0]);
+            parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (0.95f / LAG_TIME);
+            parts[0] = wrapPosition(parts[0]);
 
-            glm::vec3 direction = glm::normalize(snakeComponent.parts[snakeComponent.parts.size() - 2] - snakeComponent.parts[snakeComponent.parts.size() - 3]);
+            glm::vec3 target = snakeComponent.parts[parts.size() - 2];
+            glm::vec3 position = snakeComponent.parts[parts.size() - 1];
 
-            glm::vec3 target = snakeComponent.parts[snakeComponent.parts.size() - 2];
-            glm::vec3 position = snakeComponent.parts[snakeComponent.parts.size() - 1];
+            glm::vec3 direction = glm::normalize(target - position);
 
-            //snakeComponent.parts[snakeComponent.parts.size() - 1] += glm::normalize(target - position) * float(delta) * (0.95f / LAG_TIME);
+            if(glm::distance(target, position) > 2.0f) {
+                direction = m_previousDirection;
+            }
+
+
+            m_previousDirection = direction;
+
+            parts[parts.size() - 1] += direction * float(delta) * (0.95f / LAG_TIME);
+            parts[parts.size() - 1] = wrapPosition(parts[parts.size() - 1]);
         });
 
     }
 private:
+    glm::vec3 m_previousDirection;
+
     glm::vec3 wrapPosition(glm::vec3 position) {
-        if(position.x < -5.0f) position.x = 5.0f - (-5.0f - position.x);
-        else if(position.x > 5.0f) position.x = -4.5f + (position.x - 5.0f);
+        if(position.x < -5.5f) position.x = 5.5f - (-5.5f - position.x);
+        else if(position.x > 5.5f) position.x = -4.5f + (position.x - 5.5f);
 //
 //        if(position.z < -5.0f) position.z = 5.0f;
 //        else if(position.z > 5.0f) position.z = -5.0f;

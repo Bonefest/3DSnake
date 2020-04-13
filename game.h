@@ -60,10 +60,6 @@ public:
 
         Snake& snakeComponent = m_registry.get<Snake>(snake);
         snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
     void run() {
