@@ -23,14 +23,16 @@ glm::vec3 directionToVector(Direction direction) {
     return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
-struct Part {
-    glm::vec3 position;
-    Direction previousDirection;
-};
-
 struct Snake {
-    vector<Part> parts;
+    Snake(glm::vec3 position, Direction direction, float spd): movingDirection(direction), speed(spd) {
+        parts.push_back(position);
+        parts.push_back(position);
+    }
+
+    vector<glm::vec3> parts;
+
     Direction movingDirection;
+
     float speed;
 };
 

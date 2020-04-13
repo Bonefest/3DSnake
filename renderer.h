@@ -30,7 +30,7 @@ public:
     }
 
     void renderCube(glm::vec3 position, glm::vec3 color) {
-        m_cubesQueue.push_back(make_pair(position, color));
+        m_cubesQueue.push_back(make_pair(glm::translate(glm::mat4(1.0f), position), color));
     }
 
     void present() {
@@ -39,10 +39,7 @@ public:
         glm::mat4 vp = m_projection * m_view;
 
         for(auto cubeData : m_cubesQueue) {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubeData.first);
-
-            glm::mat4 mvp = vp * model;
+            glm::mat4 mvp = vp * cubeData.first;
             glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(mvp));
 
             glBindVertexArray(VAO);
@@ -79,7 +76,7 @@ private:
     }
 
     Program* program;
-    deque<pair<glm::vec3, glm::vec3>> m_cubesQueue;
+    deque<pair<glm::mat4, glm::vec3>> m_cubesQueue;
 
     unsigned int VAO, VBO;
     GLint uniformMVP;

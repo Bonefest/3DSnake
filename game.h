@@ -56,43 +56,20 @@ public:
 
     void initSnake() {
         entt::entity snake = m_registry.create();
-        m_registry.assign<Snake>(snake);
+        m_registry.assign<Snake>(snake, glm::vec3(0.0f, 0.0f, 0.0f), Direction::TOP, 5.0f);
 
         Snake& snakeComponent = m_registry.get<Snake>(snake);
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.parts.push_back(Part{glm::vec3(0.0f, 0.0f, 0.0f)});
-        snakeComponent.speed = 5.0f;
+        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
     void run() {
         while(!glfwWindowShouldClose(m_pwindow)) {
             double currentTime = glfwGetTime();
-            m_deltaTime = currentTime - m_lastTime;
+            m_deltaTime = (currentTime - m_lastTime);
             m_lastTime = currentTime;
 
             processInput();
@@ -112,6 +89,7 @@ public:
     }
 
     void update() {
+        m_inputSystem->update(m_registry, m_dispatcher, m_deltaTime);
         m_movingSystem->update(m_registry, m_dispatcher, m_deltaTime);
     }
 
