@@ -69,7 +69,7 @@ public:
     void run() {
         while(!glfwWindowShouldClose(m_pwindow)) {
             double currentTime = glfwGetTime();
-            m_deltaTime = (currentTime - m_lastTime);
+            m_deltaTime = (currentTime - m_lastTime) / 1.0f;
             m_lastTime = currentTime;
 
             processInput();

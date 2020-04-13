@@ -6,6 +6,8 @@
 #include "components.h"
 #include "3rdparty/entt.hpp"
 
+const float LAG_TIME = 0.3f;
+
 class ISystem {
 public:
     virtual ~ISystem() { }
@@ -45,7 +47,7 @@ public:
         m_elapsedTime += delta;
         auto snakeView = registry.view<Snake>();
         snakeView.each([&](entt::entity snake, Snake& snakeComponent) {
-            if(m_elapsedTime > 0.3f) {
+            if(m_elapsedTime > LAG_TIME) {
                 for(std::size_t i = snakeComponent.parts.size() - 1; i > 0; i--) {
                     snakeComponent.parts[i] = snakeComponent.parts[i - 1];
                 }
@@ -53,15 +55,29 @@ public:
                 m_elapsedTime = 0.0f;
             }
 
-            snakeComponent.parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * snakeComponent.speed;
+            snakeComponent.parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (0.95f / LAG_TIME);
+            snakeComponent.parts[0] = wrapPosition(snakeComponent.parts[0]);
+
+            glm::vec3 direction = glm::normalize(snakeComponent.parts[snakeComponent.parts.size() - 2] - snakeComponent.parts[snakeComponent.parts.size() - 3]);
+
             glm::vec3 target = snakeComponent.parts[snakeComponent.parts.size() - 2];
             glm::vec3 position = snakeComponent.parts[snakeComponent.parts.size() - 1];
 
-            snakeComponent.parts[snakeComponent.parts.size() - 1] += glm::normalize(target - position) * float(delta) * snakeComponent.speed;
+            //snakeComponent.parts[snakeComponent.parts.size() - 1] += glm::normalize(target - position) * float(delta) * (0.95f / LAG_TIME);
         });
 
     }
 private:
+    glm::vec3 wrapPosition(glm::vec3 position) {
+        if(position.x < -5.0f) position.x = 5.0f - (-5.0f - position.x);
+        else if(position.x > 5.0f) position.x = -4.5f + (position.x - 5.0f);
+//
+//        if(position.z < -5.0f) position.z = 5.0f;
+//        else if(position.z > 5.0f) position.z = -5.0f;
+
+        return position;
+    }
+
     double m_elapsedTime;
 };
 
@@ -71,7 +87,7 @@ public:
 
     void update(entt::registry& registry, entt::dispatcher& dispatcher, double delta) {
         m_elapsedTime += delta;
-        if(m_elapsedTime > 0.3) {
+        if(m_elapsedTime > LAG_TIME) {
             auto snakeView = registry.view<Snake>();
             snakeView.each([&](entt::entity snake, Snake& snakeComponent) {
                 snakeComponent.movingDirection = m_nextDirection;
