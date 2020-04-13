@@ -30,22 +30,64 @@ public:
     }
 
     void renderCube(glm::vec3 position, glm::vec3 color) {
-        if(position.x > 4.5f) {
-            float sizex = std::max(5.0f - (position.x - 0.5f), 0.0f);
-            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f - sizex*0.5f, position.y, position.z));
+        if(position.x > Constants::BOARD_WIDTH - 0.5f) {
+            float sizex = std::max(Constants::BOARD_WIDTH - (position.x - 0.5f), 0.0f);
+            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(Constants::BOARD_WIDTH - sizex*0.5f, position.y, position.z));
             mat = glm::scale(mat, glm::vec3(sizex, 1.0f, 1.0f));
             mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
 
             m_cubesQueue.push_back(make_pair(mat, color));
 
-            mat = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f + (1.0f - sizex)*0.5f, position.y, position.z));
+            mat = glm::translate(glm::mat4(1.0f), glm::vec3(-Constants::BOARD_WIDTH + (1.0f - sizex)*0.5f, position.y, position.z));
             mat = glm::scale(mat, glm::vec3((1.0f - sizex), 1.0f, 1.0f));
             mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
             m_cubesQueue.push_back(make_pair(mat, color));
-        } else
-        m_cubesQueue.push_back(make_pair(glm::translate(glm::mat4(1.0f), position), color));
+        } else if(position.x < -4.5f) {
+            float sizex = std::max((position.x + 0.5f) + 5.0f, 0.0f);
+            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f + sizex*0.5f, position.y, position.z));
+            mat = glm::scale(mat, glm::vec3(sizex, 1.0f, 1.0f));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+
+            mat = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f - (1.0f - sizex)*0.5f, position.y, position.z));
+            mat = glm::scale(mat, glm::vec3((1.0f - sizex), 1.0f, 1.0f));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+        } else if(position.z > 4.5f) {
+            float sizez = std::max(5.0f - (position.z - 0.5f), 0.0f);
+            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 5.0f - sizez*0.5f));
+            mat = glm::scale(mat, glm::vec3(1.0f, 1.0f, sizez));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+
+            mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -5.0f + (1.0f - sizez)*0.5f));
+            mat = glm::scale(mat, glm::vec3(1.0f, 1.0f, (1.0f - sizez)));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+        } else if(position.z < -4.5f) {
+            float sizez = std::max((position.z + 0.5f) + 5.0f, 0.0f);
+            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -5.0f + sizez*0.5f));
+            mat = glm::scale(mat, glm::vec3(1.0f, 1.0f, sizez));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+
+            mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, 5.0f - (1.0f - sizez)*0.5f));
+            mat = glm::scale(mat, glm::vec3(1.0f, 1.0f, (1.0f - sizez)));
+            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+            m_cubesQueue.push_back(make_pair(mat, color));
+        } else m_cubesQueue.push_back(make_pair(glm::translate(glm::mat4(1.0f), position), color));
+
     }
 
     void present() {

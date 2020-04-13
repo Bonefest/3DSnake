@@ -21,7 +21,7 @@ public:
     RenderingSystem() {
 
         m_renderer.setProjectionMatrix(glm::perspective(45.0f, Constants::SCREEN_WIDTH/Constants::SCREEN_HEIGHT, 0.1f, 100.0f));
-        m_renderer.setViewMatrix(glm::lookAt(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+        m_renderer.setViewMatrix(glm::lookAt(glm::vec3(0.0f, 6.0f, 8.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 
     }
     void draw(entt::registry& registry, entt::dispatcher& dispatcher) {
@@ -81,11 +81,11 @@ private:
     glm::vec3 m_previousDirection;
 
     glm::vec3 wrapPosition(glm::vec3 position) {
-        if(position.x < -5.5f) position.x = 5.5f - (-5.5f - position.x);
+        if(position.x < -5.5f) position.x = 4.5f - (-5.5f - position.x);
         else if(position.x > 5.5f) position.x = -4.5f + (position.x - 5.5f);
-//
-//        if(position.z < -5.0f) position.z = 5.0f;
-//        else if(position.z > 5.0f) position.z = -5.0f;
+
+        if(position.z < -5.5f) position.z = 4.5f - (-5.5f - position.z);
+        else if(position.z > 5.5f) position.z = -4.5f + (position.z - 5.5f);
 
         return position;
     }
@@ -120,6 +120,10 @@ public:
                 m_nextDirection = RIGHT;
             } else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && snakeComponent.movingDirection != RIGHT) {
                 m_nextDirection = LEFT;
+            }
+
+            if(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+                snakeComponent.parts.push_back(snakeComponent.parts.back());
             }
 
         });
