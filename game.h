@@ -56,7 +56,7 @@ public:
 
     void initSnake() {
         entt::entity snake = m_registry.create();
-        m_registry.assign<Snake>(snake, glm::vec3(0.0f, 0.0f, 0.0f), Direction::TOP, 5.0f);
+        m_registry.assign<Snake>(snake, glm::vec3(0.5f, 0.0f, 0.5f), Direction::TOP, 5.0f);
 
         Snake& snakeComponent = m_registry.get<Snake>(snake);
         snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));

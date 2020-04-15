@@ -7,6 +7,8 @@ namespace Constants {
 
     const float BOARD_WIDTH = 5.0f;
     const float BOARD_HEIGHT = 5.0f;
+
+    const float CELL_WIDTH = 1.0f;
 }
 
 #endif // COMMON_H_INCLUDED

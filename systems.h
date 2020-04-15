@@ -29,11 +29,12 @@ public:
         snakeView.each([&](entt::entity snake, Snake& snakeComponent){
             if(!snakeComponent.parts.empty()) {
                 for(std::size_t i = 0; i < snakeComponent.parts.size(); i++) {
-                    m_renderer.renderCube(snakeComponent.parts[i], glm::vec3(0.0f, 0.0f, 0.0f));
+                    m_renderer.renderCube(snakeComponent.parts[i], glm::vec3(1.0f, 0.7f, 0.0f));
                 }
             }
         });
         //m_renderer.renderCube(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        m_renderer.renderBox(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(2.0f * Constants::BOARD_WIDTH, 1.0f, 2.0f * Constants::BOARD_HEIGHT));
         m_renderer.present();
     }
 
@@ -57,7 +58,7 @@ public:
                 m_elapsedTime = 0.0f;
             }
 
-            parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (0.95f / LAG_TIME);
+            parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (1.0f / LAG_TIME);
             parts[0] = wrapPosition(parts[0]);
 
             glm::vec3 target = snakeComponent.parts[parts.size() - 2];
@@ -72,7 +73,7 @@ public:
 
             m_previousDirection = direction;
 
-            parts[parts.size() - 1] += direction * float(delta) * (0.95f / LAG_TIME);
+            parts[parts.size() - 1] += direction * float(delta) * (1.0f / LAG_TIME);
             parts[parts.size() - 1] = wrapPosition(parts[parts.size() - 1]);
         });
 
@@ -81,11 +82,13 @@ private:
     glm::vec3 m_previousDirection;
 
     glm::vec3 wrapPosition(glm::vec3 position) {
-        if(position.x < -5.5f) position.x = 4.5f - (-5.5f - position.x);
-        else if(position.x > 5.5f) position.x = -4.5f + (position.x - 5.5f);
+        float size = Constants::CELL_WIDTH * 0.5f;
 
-        if(position.z < -5.5f) position.z = 4.5f - (-5.5f - position.z);
-        else if(position.z > 5.5f) position.z = -4.5f + (position.z - 5.5f);
+        if(position.x < -Constants::BOARD_WIDTH - size) position.x = Constants::BOARD_WIDTH - size - (-Constants::BOARD_WIDTH - size - position.x);
+        else if(position.x > Constants::BOARD_WIDTH + size) position.x = -Constants::BOARD_WIDTH + size + (position.x - Constants::BOARD_WIDTH - size);
+
+        if(position.z < -Constants::BOARD_HEIGHT - size) position.z = Constants::BOARD_HEIGHT - size - (-Constants::BOARD_HEIGHT - size - position.z);
+        else if(position.z > Constants::BOARD_HEIGHT + size) position.z = -Constants::BOARD_HEIGHT + size + (position.z - Constants::BOARD_HEIGHT - size);
 
         return position;
     }
