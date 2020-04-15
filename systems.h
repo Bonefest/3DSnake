@@ -36,6 +36,7 @@ public:
                 }
 
                 m_renderer.renderCube(snakeComponent.parts[1] + directionToVector(snakeComponent.movingDirection) * 0.1f, glm::vec3(1.0f, 0.7f, 0.0f));
+                m_renderer.setViewMatrix(glm::lookAt(glm::vec3(0.0f, 8.0f, 10.0f), snakeComponent.parts[0], glm::vec3(0.0f, 1.0f, 0.0f)));
             }
         });
 
@@ -44,6 +45,7 @@ public:
         });
 
         m_renderer.renderBox(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(2.0f * Constants::BOARD_WIDTH, 1.0f, 2.0f * Constants::BOARD_HEIGHT));
+
         m_renderer.present();
     }
 
