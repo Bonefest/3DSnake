@@ -6,7 +6,10 @@
 #include "components.h"
 #include "3rdparty/entt.hpp"
 
-const float LAG_TIME = 0.3f;
+#include <stdexcept>
+
+constexpr const float LAG_TIME = 0.3f;
+constexpr float SPEED = 1.0f / LAG_TIME;
 
 class ISystem {
 public:
@@ -21,7 +24,7 @@ public:
     RenderingSystem() {
 
         m_renderer.setProjectionMatrix(glm::perspective(45.0f, Constants::SCREEN_WIDTH/Constants::SCREEN_HEIGHT, 0.1f, 100.0f));
-        m_renderer.setViewMatrix(glm::lookAt(glm::vec3(0.0f, 6.0f, 8.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+        m_renderer.setViewMatrix(glm::lookAt(glm::vec3(0.0f, 8.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 
     }
     void draw(entt::registry& registry, entt::dispatcher& dispatcher) {
@@ -31,15 +34,38 @@ public:
                 for(std::size_t i = 0; i < snakeComponent.parts.size(); i++) {
                     m_renderer.renderCube(snakeComponent.parts[i], glm::vec3(1.0f, 0.7f, 0.0f));
                 }
+
+                m_renderer.renderCube(snakeComponent.parts[1] + directionToVector(snakeComponent.movingDirection) * 0.1f, glm::vec3(1.0f, 0.7f, 0.0f));
             }
         });
-        //m_renderer.renderCube(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+        registry.view<Apple>().each([&](entt::entity apple, Apple& appleComponent) {
+            m_renderer.renderCube(appleComponent.position, glm::vec3(1.0f, 0.0f, 0.0f));
+        });
+
         m_renderer.renderBox(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(2.0f * Constants::BOARD_WIDTH, 1.0f, 2.0f * Constants::BOARD_HEIGHT));
         m_renderer.present();
     }
 
 private:
     Renderer m_renderer;
+};
+
+class AppleSpawningSystem: public ISystem {
+public:
+    void update(entt::registry& registry, entt::dispatcher& dispatcher, double delta) {
+        auto appleView = registry.view<Apple>();
+        if(appleView.size() < Constants::MAX_APPLES_COUNT) {
+            if(drand48() * 100.0f < Constants::APPLE_SPAWN_CHANCE) {
+                float randX = std::round( (drand48() - drand48()) * Constants::BOARD_WIDTH);
+                float randZ = std::round( (drand48() - drand48()) * Constants::BOARD_HEIGHT);
+
+                auto apple = registry.create();
+                registry.assign<Apple>(apple, glm::vec3(randX, 0.0f, randZ));
+            }
+        }
+
+    }
 };
 
 class MovingSystem: public ISystem {
@@ -51,14 +77,34 @@ public:
         snakeView.each([&](entt::entity snake, Snake& snakeComponent) {
             auto& parts = snakeComponent.parts;
             if(m_elapsedTime > LAG_TIME) {
-                for(std::size_t i = parts.size() - 1; i > 0; i--) {
-                    parts[i] = parts[i - 1];
+
+                for(std::size_t i = 1; i < parts.size(); ++i) {
+                    if(glm::distance(parts[0], parts[i]) < 0.1f)
+                        throw std::logic_error("You lose!");
                 }
 
+                for(std::size_t i = parts.size() - 1; i > 0; i--) {
+                    parts[i] = glm::round(parts[i - 1]);
+                }
+
+                vector<entt::entity> collidedApples;
+                registry.view<Apple>().each([&](entt::entity apple, Apple& appleComponent) {
+                    if(glm::distance(parts[0], appleComponent.position) < 0.1f) {
+                        collidedApples.push_back(apple);
+                        parts.push_back(parts.back());
+                        //trigger event
+                    }
+                });
+
+                for(auto apple : collidedApples)
+                    registry.destroy(apple);
+
                 m_elapsedTime = 0.0f;
+                snakeComponent.parts[0] = glm::round(snakeComponent.parts[0]);
             }
 
-            parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * (1.0f / LAG_TIME);
+
+            parts[0] += directionToVector(snakeComponent.movingDirection) * float(delta) * SPEED;
             parts[0] = wrapPosition(parts[0]);
 
             glm::vec3 target = snakeComponent.parts[parts.size() - 2];
@@ -73,7 +119,7 @@ public:
 
             m_previousDirection = direction;
 
-            parts[parts.size() - 1] += direction * float(delta) * (1.0f / LAG_TIME);
+            parts[parts.size() - 1] += direction * float(delta) * SPEED;
             parts[parts.size() - 1] = wrapPosition(parts[parts.size() - 1]);
         });
 
@@ -135,6 +181,7 @@ private:
     double m_elapsedTime;
     Direction m_nextDirection;
 };
+
 
 
 #endif // SYSTEMS_H_INCLUDED

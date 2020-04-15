@@ -36,4 +36,10 @@ struct Snake {
     float speed;
 };
 
+struct Apple {
+    explicit Apple(glm::vec3 applePosition): position(applePosition) { }
+    glm::vec3 position;
+};
+
+
 #endif // COMPONENTS_H_INCLUDED

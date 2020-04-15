@@ -43,6 +43,7 @@ public:
         m_inputSystem = new InputProcessingSystem();
         m_renderingSystem = new RenderingSystem();
         m_movingSystem = new MovingSystem();
+        m_appleSpawningSystem = new AppleSpawningSystem();
 
         initSnake();
     }
@@ -51,15 +52,15 @@ public:
         delete m_inputSystem;
         delete m_renderingSystem;
         delete m_movingSystem;
+        delete m_appleSpawningSystem;
         glfwTerminate();
     }
 
     void initSnake() {
         entt::entity snake = m_registry.create();
-        m_registry.assign<Snake>(snake, glm::vec3(0.5f, 0.0f, 0.5f), Direction::TOP, 5.0f);
+        m_registry.assign<Snake>(snake, glm::vec3(0.0f, 0.0f, 0.0f), Direction::TOP, 5.0f);
 
         Snake& snakeComponent = m_registry.get<Snake>(snake);
-        snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
         snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
         snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
         snakeComponent.parts.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -91,6 +92,7 @@ public:
     void update() {
         m_inputSystem->update(m_registry, m_dispatcher, m_deltaTime);
         m_movingSystem->update(m_registry, m_dispatcher, m_deltaTime);
+        m_appleSpawningSystem->update(m_registry, m_dispatcher, m_deltaTime);
     }
 
     void draw() {
@@ -114,6 +116,7 @@ private:
 
     InputProcessingSystem* m_inputSystem;
     RenderingSystem* m_renderingSystem;
+    AppleSpawningSystem* m_appleSpawningSystem;
     MovingSystem* m_movingSystem;
 };
 

@@ -13,6 +13,8 @@ using std::make_pair;
 using std::deque;
 using std::pair;
 
+const float MIN_OFFSET = 0.1f;
+
 class Renderer {
 public:
     Renderer() {
@@ -33,60 +35,77 @@ public:
     void renderCube(glm::vec3 position, glm::vec3 color) {
         if(position.x > Constants::BOARD_WIDTH - Constants::CELL_WIDTH * 0.5f) {
             float sizex = std::max(Constants::BOARD_WIDTH - (position.x - Constants::CELL_WIDTH * 0.5f), 0.0f);
-            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(Constants::BOARD_WIDTH - sizex*0.5f, position.y, position.z));
-            mat = glm::scale(mat, glm::vec3(sizex, Constants::CELL_WIDTH, Constants::CELL_WIDTH));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+
+            if(sizex > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(Constants::BOARD_WIDTH - sizex*0.5f, position.y, position.z));
+                mat = glm::scale(mat, glm::vec3(sizex, Constants::CELL_WIDTH, Constants::CELL_WIDTH));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
 
-            mat = glm::translate(glm::mat4(1.0f), glm::vec3(-Constants::BOARD_WIDTH + (Constants::CELL_WIDTH - sizex)*0.5f, position.y, position.z));
-            mat = glm::scale(mat, glm::vec3((Constants::CELL_WIDTH - sizex), Constants::CELL_WIDTH, Constants::CELL_WIDTH));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(Constants::CELL_WIDTH - sizex > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(-Constants::BOARD_WIDTH + (Constants::CELL_WIDTH - sizex)*0.5f, position.y, position.z));
+                mat = glm::scale(mat, glm::vec3((Constants::CELL_WIDTH - sizex), Constants::CELL_WIDTH, Constants::CELL_WIDTH));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
         } else if(position.x < -Constants::BOARD_WIDTH + Constants::CELL_WIDTH * 0.5f) {
             float sizex = std::max((position.x + Constants::CELL_WIDTH * 0.5f) + Constants::BOARD_WIDTH, 0.0f);
-            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(-Constants::BOARD_WIDTH + sizex*0.5f, position.y, position.z));
-            mat = glm::scale(mat, glm::vec3(sizex, Constants::CELL_WIDTH, Constants::CELL_WIDTH));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(sizex > 0.1f) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(-Constants::BOARD_WIDTH + sizex*0.5f, position.y, position.z));
+                mat = glm::scale(mat, glm::vec3(sizex, Constants::CELL_WIDTH, Constants::CELL_WIDTH));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
 
-            mat = glm::translate(glm::mat4(1.0f), glm::vec3(Constants::BOARD_WIDTH - (Constants::CELL_WIDTH - sizex)*0.5f, position.y, position.z));
-            mat = glm::scale(mat, glm::vec3((Constants::CELL_WIDTH - sizex), Constants::CELL_WIDTH, Constants::CELL_WIDTH));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(Constants::CELL_WIDTH - sizex > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(Constants::BOARD_WIDTH - (Constants::CELL_WIDTH - sizex)*0.5f, position.y, position.z));
+                mat = glm::scale(mat, glm::vec3((Constants::CELL_WIDTH - sizex), Constants::CELL_WIDTH, Constants::CELL_WIDTH));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
         } else if(position.z > Constants::BOARD_HEIGHT - Constants::CELL_WIDTH * 0.5f) {
             float sizez = std::max(Constants::BOARD_HEIGHT - (position.z - Constants::CELL_WIDTH * 0.5f), 0.0f);
-            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, Constants::BOARD_HEIGHT - sizez*0.5f));
-            mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, sizez));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(sizez > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, Constants::BOARD_HEIGHT - sizez*0.5f));
+                mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, sizez));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
 
-            mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -Constants::BOARD_HEIGHT + (Constants::CELL_WIDTH - sizez)*0.5f));
-            mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, (Constants::CELL_WIDTH - sizez)));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(Constants::CELL_WIDTH - sizez > 0.1f) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -Constants::BOARD_HEIGHT + (Constants::CELL_WIDTH - sizez)*0.5f));
+                mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, (Constants::CELL_WIDTH - sizez)));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
         } else if(position.z < -Constants::BOARD_HEIGHT + Constants::CELL_WIDTH * 0.5f) {
             float sizez = std::max((position.z + Constants::CELL_WIDTH * 0.5f) + Constants::BOARD_HEIGHT, 0.0f);
-            glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -Constants::BOARD_HEIGHT + sizez*0.5f));
-            mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, sizez));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(sizez > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, -Constants::BOARD_HEIGHT + sizez*0.5f));
+                mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, sizez));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
 
-            mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, Constants::BOARD_HEIGHT - (Constants::CELL_WIDTH - sizez)*0.5f));
-            mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, (Constants::CELL_WIDTH - sizez)));
-            mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
+            if(Constants::CELL_WIDTH - sizez > MIN_OFFSET) {
+                glm::mat4 mat = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, Constants::BOARD_HEIGHT - (Constants::CELL_WIDTH - sizez)*0.5f));
+                mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, (Constants::CELL_WIDTH - sizez)));
+                mat = glm::translate(mat, glm::vec3(0.0f, 0.0f, 0.0f));
 
-            m_cubesQueue.push_back(make_pair(mat, color));
+                m_cubesQueue.push_back(make_pair(mat, color));
+            }
         } else {
             glm::mat4 mat = glm::translate(glm::mat4(1.0f), position);
             mat = glm::scale(mat, glm::vec3(Constants::CELL_WIDTH, Constants::CELL_WIDTH, Constants::CELL_WIDTH));
